@@ -1,0 +1,50 @@
+import { useState } from 'react';
+import css from './App.module.css';
+
+import { type Votes, type VoteType } from '../../types/votes.ts';
+
+import Cafeinfo from '../CafeInfo/CafeInfo.tsx';
+import VoteOptions from '../VoteOptions/VoteOptions.tsx';
+import VoteStats from '../VoteStats/VoteStats.tsx';
+import Notification from '../Notification/Notification.tsx';
+
+function App() {
+  const [votes, setVotes] = useState<Votes>({ good: 0, neutral: 0, bad: 0 });
+  const totalVotes: number = votes.good + votes.bad + votes.neutral;
+  const positiveRate: number = totalVotes
+    ? Math.round((votes.good / totalVotes) * 100)
+    : 0;
+
+  function handleVote(type: VoteType): void {
+    setVotes({
+      ...votes,
+      [type]: votes[type] + 1,
+    });
+  }
+
+  function resetVotes() {
+    setVotes({ good: 0, neutral: 0, bad: 0 });
+  }
+
+  return (
+    <div className={css.app}>
+      <Cafeinfo />
+      <VoteOptions
+        onVote={handleVote}
+        onReset={resetVotes}
+        canReset={totalVotes ? true : false}
+      />
+      {totalVotes ? (
+        <VoteStats
+          votes={votes}
+          totalVotes={totalVotes}
+          positiveRate={positiveRate}
+        />
+      ) : (
+        <Notification />
+      )}
+    </div>
+  );
+}
+
+export default App;
